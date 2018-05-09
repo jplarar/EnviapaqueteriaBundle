@@ -65,15 +65,88 @@ jplarar_enviapaqueteria:
 ###Generate Quote
 ``` php
 <?php 
-    $result = $enviapaqueteriaClient->sendEmail(
-                'recipient@example.com', 
-                'subject', 
-                'sender@example.com', 
-                '<h1>AWS Amazon Simple Email Service Test Email</h1>',
-                'This email was send with Amazon SES using the AWS SDK for Symfony.'
+    $quotes = $enviapaqueteriaClient->quote(
+                    $origin[
+                        "representative" => "Origen test",
+                        "company" => "Origen Empresa",
+                        "email" => "correo@pruebas.com",
+                        "phone" => "8111234567",
+                        "country" => "MX",
+                        "address1" => "av vasconcelos",
+                        "address2" => "1400",
+                        "addressExtra" => "enfrente de office depot",
+                        "zipCode" => "66240"
+                    ], 
+                    $destination[
+                        "representative" => "Destino test",
+                        "company" => "Origen Empresa",
+                        "email" => "correo@pruebas.com",
+                        "phone" => "8111234567",
+                        "country" => "MX",
+                        "address1" => "av vasconcelos",
+                        "address2" => "1400",
+                        "addressExtra" => "enfrente de office depot",
+                        "zipCode" => "66240"
+                    ], 
+                    $options[
+                        "content" => "vestido",
+                        "insurance" => 0,
+                        "value" => "",
+                        "height" => 10,
+                        "width" => 10,
+                        "length" => 10,
+                        "weight" => 2,
+                        "amount" => 1,
+                        "collection" => null,
+                        "collection_time" => "",
+                        "collection_time_limit" => "",
+                        "collection_date" => ""
+                    ]
             );
             
-            $messageId = $result->get('MessageId');
-            echo("Email sent! Message ID: $messageId"."\n");
+    $shipping = $enviapaqueteriaClient->create(
+                    $provider[
+                        "name" => "fedex",
+                        "service" => "FEDEX_EXPRESS_SAVER"   
+                     ],
+                    $origin[
+                        "representative" => "Origen test",
+                        "company" => "Origen Empresa",
+                        "email" => "correo@pruebas.com",
+                        "phone" => "8111234567",
+                        "country" => "MX",
+                        "address1" => "av vasconcelos",
+                        "address2" => "1400",
+                        "addressExtra" => "enfrente de office depot",
+                        "zipCode" => "66240"
+                    ], 
+                    $destination[
+                        "representative" => "Destino test",
+                        "company" => "Origen Empresa",
+                        "email" => "correo@pruebas.com",
+                        "phone" => "8111234567",
+                        "country" => "MX",
+                        "address1" => "av vasconcelos",
+                        "address2" => "1400",
+                        "addressExtra" => "enfrente de office depot",
+                        "zipCode" => "66240"
+                    ], 
+                    $options[
+                        "content" => "vestido",
+                        "insurance" => 0,
+                        "value" => "",
+                        "height" => 10,
+                        "width" => 10,
+                        "length" => 10,
+                        "weight" => 2,
+                        "amount" => 1,
+                        "collection" => null,
+                        "collection_time" => "",
+                        "collection_time_limit" => "",
+                        "collection_date" => "",
+                        "file" => "PDF",
+                        "paper" => "PAPER_7X4.75",
+                    ]
+                );
 ?>
 ```

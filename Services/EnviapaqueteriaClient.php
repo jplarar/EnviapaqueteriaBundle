@@ -56,7 +56,7 @@ class EnviapaqueteriaClient
                         "origen_empresa" => $origin["company"],
                         "origen_email" => $origin["email"],
                         "origen_tel" => $origin["phone"],
-                        "origen_pais" => "MX",
+                        "origen_pais" => $origin["country"],
                         "origen_direccion" => $origin["address1"],
                         "origen_direccion2" => $origin["address2"],
                         "origen_extra" => $origin["addressExtra"],
@@ -65,7 +65,7 @@ class EnviapaqueteriaClient
                         "destino_empresa" => $destination["company"],
                         "destino_email" => $destination["email"],
                         "destino_tel" => $destination["phone"],
-                        "destino_pais" => "MX",
+                        "destino_pais" => $destination["country"],
                         "destino_direccion" => $destination["address1"],
                         "destino_direccion2" => $destination["address2"],
                         "destino_extra" => $destination["addressExtra"],
@@ -101,11 +101,16 @@ class EnviapaqueteriaClient
             $context = stream_context_create($options);
             $response = json_decode(file_get_contents($this->url.self::QUOTE_PATH, false, $context));
 
+            if ($response[0]["status"] != "success") {
+                return false;
+            }
+
+            $data = $response[0]["data"];
+            return $data;
+
         } catch(\Exception $e) {
             return $e->getMessage();
         }
-
-        return $response;
     }
 
 
@@ -124,7 +129,7 @@ class EnviapaqueteriaClient
                         "origen_empresa" => $origin["company"],
                         "origen_email" => $origin["email"],
                         "origen_tel" => $origin["phone"],
-                        "origen_pais" => "MX",
+                        "origen_pais" => $origin["country"],
                         "origen_direccion" => $origin["address1"],
                         "origen_direccion2" => $origin["address2"],
                         "origen_extra" => $origin["addressExtra"],
@@ -133,7 +138,7 @@ class EnviapaqueteriaClient
                         "destino_empresa" => $destination["company"],
                         "destino_email" => $destination["email"],
                         "destino_tel" => $destination["phone"],
-                        "destino_pais" => "MX",
+                        "destino_pais" => $destination["country"],
                         "destino_direccion" => $destination["address1"],
                         "destino_direccion2" => $destination["address2"],
                         "destino_extra" => $destination["addressExtra"],
@@ -146,7 +151,7 @@ class EnviapaqueteriaClient
                         "largo" => $options["length"],
                         "peso" => $options["weight"],
                         "num_guias" => $options["amount"],
-                        "agendar_recoleccion" => $options["weight"],
+                        "agendar_recoleccion" => $options["collection"],
                         "hora_recoleccion" => $options["collection_time"],
                         "hora_limite" => $options["collection_time_limit"],
                         "fecha_recoleccion" => $options["collection_date"],
@@ -171,12 +176,15 @@ class EnviapaqueteriaClient
             $context = stream_context_create($options);
             $response = json_decode(file_get_contents($this->url.self::CREATE_PATH, false, $context));
 
+            if ($response[0]["status"] != "success") {
+                return false;
+            }
+
+            $data = $response[0]["data"];
+            return $data;
+
         } catch(\Exception $e) {
             return $e->getMessage();
         }
-
-        return $response;
-
-
     }
 }
