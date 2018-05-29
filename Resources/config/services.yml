@@ -1,0 +1,4 @@
+services:
+     enviapaqueteria_client:
+         class:     Jplarar\EnviapaqueteriaBundle\Services\EnviapaqueteriaClient
+         arguments: [%enviapaqueteria_user%, %enviapaqueteria_password%, %enviapaqueteria_environment%]
