@@ -50,7 +50,7 @@ class EnviapaqueteriaClient
 
         try {
             $data = [
-                "data" => array(
+                "data" => 
                     array(
                         "origen_representante" => $origin["representative"],
                         "origen_empresa" => $origin["company"],
@@ -83,7 +83,6 @@ class EnviapaqueteriaClient
                         "hora_limite" => $options["collection_time_limit"],
                         "fecha_recoleccion" => $options["collection_date"]
                     )
-                )
             ];
 
             $options = array(
@@ -99,7 +98,11 @@ class EnviapaqueteriaClient
             );
 
             $context = stream_context_create($options);
-            $response = json_decode(file_get_contents($this->url.self::QUOTE_PATH, false, $context));
+            $response = file_get_contents($this->url.self::QUOTE_PATH, false, $context);
+            $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            //return file_get_contents($this->url.self::QUOTE_PATH, false, $context);
+            //return $response;
 
             if ($response[0]["status"] != "success") {
                 return false;
@@ -119,7 +122,7 @@ class EnviapaqueteriaClient
 
         try {
             $data = [
-                "data" => array(
+                "data" =>
                     array(
                         "info_paqueteria" => array(
                             "paqueteria" => $provider["name"],
@@ -158,7 +161,6 @@ class EnviapaqueteriaClient
                         "tipo_impresion" => $options["file"],
                         "tipo_papel" => $options["paper"]
                     )
-                )
             ];
 
             $options = array(
@@ -174,7 +176,8 @@ class EnviapaqueteriaClient
             );
 
             $context = stream_context_create($options);
-            $response = json_decode(file_get_contents($this->url.self::CREATE_PATH, false, $context));
+            $response = file_get_contents($this->url.self::CREATE_PATH, false, $context);
+            $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             if ($response[0]["status"] != "success") {
                 return false;

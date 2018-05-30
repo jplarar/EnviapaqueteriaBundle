@@ -34,7 +34,7 @@ public function registerBundles()
 {
     $bundles = array(
         // ...
-        new Jplarar\SESBundle\JplararEnviapaqueteriaBundle()
+        new Jplarar\EnviapaqueteriaBundle\EnviapaqueteriaBundle()
     );
 }
 ```
@@ -66,7 +66,7 @@ jplarar_enviapaqueteria:
 ``` php
 <?php 
     $quotes = $enviapaqueteriaClient->quote(
-                    $origin[
+                    $origin = [
                         "representative" => "Origen test",
                         "company" => "Origen Empresa",
                         "email" => "correo@pruebas.com",
@@ -77,7 +77,7 @@ jplarar_enviapaqueteria:
                         "addressExtra" => "enfrente de office depot",
                         "zipCode" => "66240"
                     ], 
-                    $destination[
+                    $destination = [
                         "representative" => "Destino test",
                         "company" => "Origen Empresa",
                         "email" => "correo@pruebas.com",
@@ -88,7 +88,7 @@ jplarar_enviapaqueteria:
                         "addressExtra" => "enfrente de office depot",
                         "zipCode" => "66240"
                     ], 
-                    $options[
+                    $options = [
                         "content" => "vestido",
                         "insurance" => 0,
                         "value" => "",
@@ -105,11 +105,11 @@ jplarar_enviapaqueteria:
             );
             
     $shipping = $enviapaqueteriaClient->create(
-                    $provider[
+                    $provider = [
                         "name" => "fedex",
                         "service" => "FEDEX_EXPRESS_SAVER"   
                      ],
-                    $origin[
+                    $origin = [
                         "representative" => "Origen test",
                         "company" => "Origen Empresa",
                         "email" => "correo@pruebas.com",
@@ -120,7 +120,7 @@ jplarar_enviapaqueteria:
                         "addressExtra" => "enfrente de office depot",
                         "zipCode" => "66240"
                     ], 
-                    $destination[
+                    $destination = [
                         "representative" => "Destino test",
                         "company" => "Origen Empresa",
                         "email" => "correo@pruebas.com",
@@ -131,7 +131,7 @@ jplarar_enviapaqueteria:
                         "addressExtra" => "enfrente de office depot",
                         "zipCode" => "66240"
                     ], 
-                    $options[
+                    $options = [
                         "content" => "vestido",
                         "insurance" => 0,
                         "value" => "",
