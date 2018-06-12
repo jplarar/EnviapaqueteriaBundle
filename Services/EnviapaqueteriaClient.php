@@ -45,13 +45,17 @@ class EnviapaqueteriaClient
      * @param $options
      * @return mixed|string
      */
-    public function quote($origin, $destination, $options)
+    public function quote($provider, $origin, $destination, $options)
     {
 
         try {
             $data = [
                 "data" => 
                     array(
+                        "info_paqueteria" => array(
+                            "paqueteria" => $provider["name"],
+                            "tipo_servicio" => $provider["service"]
+                        ),
                         "origen_representante" => $origin["representative"],
                         "origen_empresa" => $origin["company"],
                         "origen_email" => $origin["email"],
@@ -180,7 +184,7 @@ class EnviapaqueteriaClient
             $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             if ($response[0]["status"] != "success") {
-                return false;
+                return $response[0];
             }
 
             $data = $response[0]["data"];
