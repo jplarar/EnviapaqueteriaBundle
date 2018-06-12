@@ -184,7 +184,7 @@ class EnviapaqueteriaClient
             $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             if ($response[0]["status"] != "success") {
-                return $response[0];
+                return false;
             }
 
             $data = $response[0]["data"];
