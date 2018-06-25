@@ -82,7 +82,7 @@ class EnviapaqueteriaClient
                         "largo" => $options["length"],
                         "peso" => $options["weight"],
                         "num_guias" => $options["amount"],
-                        "agendar_recoleccion" => $options["weight"],
+                        "agendar_recoleccion" => $options["collection"],
                         "hora_recoleccion" => $options["collection_time"],
                         "hora_limite" => $options["collection_time_limit"],
                         "fecha_recoleccion" => $options["collection_date"]
