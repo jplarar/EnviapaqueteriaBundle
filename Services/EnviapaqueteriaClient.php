@@ -183,12 +183,13 @@ class EnviapaqueteriaClient
             $response = file_get_contents($this->url.self::CREATE_PATH, false, $context);
             $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            if ($response[0]["status"] != "success") {
-                return false;
-            }
+            return $response;
+            // if ($response[0]["status"] != "success") {
+            //     return $response;
+            // }
 
-            $data = $response[0]["data"];
-            return $data;
+            // $data = $response[0]["data"];
+            // return $data;
 
         } catch(\Exception $e) {
             return $e->getMessage();
