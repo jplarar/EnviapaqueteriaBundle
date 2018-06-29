@@ -163,7 +163,9 @@ class EnviapaqueteriaClient
                         "hora_limite" => $options["collection_time_limit"],
                         "fecha_recoleccion" => $options["collection_date"],
                         "tipo_impresion" => $options["file"],
-                        "tipo_papel" => $options["paper"]
+                        "tipo_papel" => $options["paper"],
+                        "num_paq_recoleccion" => $options["number_of_packages"],
+						"peso_total_paq_recoleccion" => $options["total_weight"]
                     )
             ];
 
