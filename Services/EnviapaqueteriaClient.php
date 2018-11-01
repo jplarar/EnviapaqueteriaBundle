@@ -3,18 +3,23 @@
 namespace Jplarar\EnviapaqueteriaBundle\Services;
 
 /**
- * Reference: https://www.enviapaqueteria.com/documentacion-api#documenter-1
+ * Reference: https://api.envia.com/doc.php#reference
  * Class EnviapaqueteriaClient
  * @package Jplarar\EnviapaqueteriaBundle\Services
  */
 class EnviapaqueteriaClient
 {
 
-    const ENDPOINT = "https://www.enviapaqueteria.com";
-    const ENDPOINT_DEV = "https://enviapaqueteria-staging.herokuapp.com";
+    const ENDPOINT = "https://api.envia.com";
+    const ENDPOINT_DEV = "https://api-test.envia.com";
 
-    const QUOTE_PATH = "/ws-enviapaqueteria/cotizar";
-    const CREATE_PATH = "/ws-enviapaqueteria/generar";
+    const RATE_PATH = "/ship/rate/";
+    const GENERATE_PATH = "/ship/generate/";
+    const PICK_UP_PATH = "/ship/pickup/";
+
+    // NOT ON USER
+    const CANCEL_PATH = "/ship/cancel/";
+    const TRACK_PATH = "/ship/generaltrack/";
 
     protected $user;
     protected $password;
@@ -37,61 +42,72 @@ class EnviapaqueteriaClient
         }
     }
 
-
     /**
-     * https://www.enviapaqueteria.com/documentacion-api#documenter-3-2
+     * https://api.envia.com/doc.php#rate
      * @param $origin
      * @param $destination
-     * @param $options
-     * @return mixed|string
+     * @param $package
+     * @param $shipment
+     * @return bool|string
      */
-    public function quote($provider, $origin, $destination, $options)
+    public function quote($origin, $destination, $package, $shipment)
     {
+        $url = $this->url.self::RATE_PATH;
+        $username = $this->user;
+        $password = $this->password;
 
         try {
             $data = [
-                "data" => 
-                    array(
-                        "info_paqueteria" => array(
-                            "paqueteria" => $provider["name"],
-                            "tipo_servicio" => $provider["service"]
-                        ),
-                        "origen_representante" => $origin["representative"],
-                        "origen_empresa" => $origin["company"],
-                        "origen_email" => $origin["email"],
-                        "origen_tel" => $origin["phone"],
-                        "origen_pais" => $origin["country"],
-                        "origen_direccion" => $origin["address1"],
-                        "origen_direccion2" => $origin["address2"],
-                        "origen_extra" => $origin["addressExtra"],
-                        "origen_cp" => $origin["zipCode"],
-                        "destino_representante" => $destination["representative"],
-                        "destino_empresa" => $destination["company"],
-                        "destino_email" => $destination["email"],
-                        "destino_tel" => $destination["phone"],
-                        "destino_pais" => $destination["country"],
-                        "destino_direccion" => $destination["address1"],
-                        "destino_direccion2" => $destination["address2"],
-                        "destino_extra" => $destination["addressExtra"],
-                        "destino_cp" => $destination["zipCode"],
-                        "contenido" => $options["content"],
-                        "seguro" => $options["insurance"],
-                        "valor_declarado" => $options["value"],
-                        "alto" => $options["height"],
-                        "ancho" => $options["width"],
-                        "largo" => $options["length"],
-                        "peso" => $options["weight"],
-                        "num_guias" => $options["amount"],
-                        "agendar_recoleccion" => $options["collection"],
-                        "hora_recoleccion" => $options["collection_time"],
-                        "hora_limite" => $options["collection_time_limit"],
-                        "fecha_recoleccion" => $options["collection_date"]
-                    )
+                "origin" => array(
+                    "name"          => $origin["name"],
+                    "company"       => $origin["company"],
+                    "email"         => $origin["email"],
+                    "phone"         => $origin["phone"],
+                    "street"        => $origin["street"],
+                    "number"        => $origin["number"],
+                    "district"      => $origin["district"],
+                    "city"          => $origin["city"],
+                    "state"         => $origin["state"],
+                    "country"       => $origin["country"],
+                    "postalCode"    => $origin["zip"]
+                ),
+                "destination" => array(
+                    "name"          => $destination["name"],
+                    "company"       => $destination["company"],
+                    "email"         => $destination["email"],
+                    "phone"         => $destination["phone"],
+                    "street"        => $destination["street"],
+                    "number"        => $destination["number"],
+                    "district"      => $destination["district"],
+                    "city"          => $destination["city"],
+                    "state"         => $destination["state"],
+                    "country"       => $destination["country"],
+                    "postalCode"    => $destination["postalCode"]
+                ),
+                "package" => array(
+                    "content"   => $package["content"],
+                    "amount"    => $package["amount"],
+                    "type"      => $package["type"],
+                    "dimensions" => array(
+                        "length" => $package["dimensions_length"],
+                        "width"  => $package["dimensions_width"],
+                        "height" => $package["dimensions_height"]
+                    ),
+                    "weight" => $package["weight"],
+                    "insurance" => $package["insurance"],
+                    "declaredValue" => $package["declaredValue"]
+                ),
+                "shipment" => array(
+                    "carrier" => $shipment["carrier"]
+                )
             ];
 
             $options = array(
                 'http' => array(
-                    'header' => ["Content-Type: application/json", "Authorization: Basic " . base64_encode("$this->user:$this->password")],
+                    'header' => [
+                        "Content-Type: application/json",
+                        "Authorization: Basic ".base64_encode("$username:$password")
+                    ],
                     'method' => "POST",
                     'content' => json_encode($data)
                 ),
@@ -100,78 +116,94 @@ class EnviapaqueteriaClient
                     "verify_peer_name" => false,
                 )
             );
+            $context  = stream_context_create($options);
+            $json = file_get_contents($url, false, $context);
+            $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            $context = stream_context_create($options);
-            $response = file_get_contents($this->url.self::QUOTE_PATH, false, $context);
-            $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-            //return file_get_contents($this->url.self::QUOTE_PATH, false, $context);
-            //return $response;
-
-            if ($response[0]["status"] != "success") {
+            // Error response
+            if ($response["meta"] != "rate") {
                 return false;
             }
 
-            $data = $response[0]["data"];
-            return $data;
+            return $response["data"];
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
 
-
-    public function create($provider, $origin, $destination, $options)
+    /**
+     * https://api.envia.com/doc.php#generate
+     * @param $origin
+     * @param $destination
+     * @param $package
+     * @param $shipment
+     * @return bool|string
+     */
+    public function create($origin, $destination, $package, $shipment)
     {
+        $url = $this->url.self::GENERATE_PATH;
+        $username = $this->user;
+        $password = $this->password;
 
         try {
             $data = [
-                "data" =>
-                    array(
-                        "info_paqueteria" => array(
-                            "paqueteria" => $provider["name"],
-                            "tipo_servicio" => $provider["service"]
-                        ),
-                        "origen_representante" => $origin["representative"],
-                        "origen_empresa" => $origin["company"],
-                        "origen_email" => $origin["email"],
-                        "origen_tel" => $origin["phone"],
-                        "origen_pais" => $origin["country"],
-                        "origen_direccion" => $origin["address1"],
-                        "origen_direccion2" => $origin["address2"],
-                        "origen_extra" => $origin["addressExtra"],
-                        "origen_cp" => $origin["zipCode"],
-                        "destino_representante" => $destination["representative"],
-                        "destino_empresa" => $destination["company"],
-                        "destino_email" => $destination["email"],
-                        "destino_tel" => $destination["phone"],
-                        "destino_pais" => $destination["country"],
-                        "destino_direccion" => $destination["address1"],
-                        "destino_direccion2" => $destination["address2"],
-                        "destino_extra" => $destination["addressExtra"],
-                        "destino_cp" => $destination["zipCode"],
-                        "contenido" => $options["content"],
-                        "seguro" => $options["insurance"],
-                        "valor_declarado" => $options["value"],
-                        "alto" => $options["height"],
-                        "ancho" => $options["width"],
-                        "largo" => $options["length"],
-                        "peso" => $options["weight"],
-                        "num_guias" => $options["amount"],
-                        "agendar_recoleccion" => $options["collection"],
-                        "hora_recoleccion" => $options["collection_time"],
-                        "hora_limite" => $options["collection_time_limit"],
-                        "fecha_recoleccion" => $options["collection_date"],
-                        "tipo_impresion" => $options["file"],
-                        "tipo_papel" => $options["paper"],
-                        "num_paq_recoleccion" => $options["number_of_packages"],
-						"peso_total_paq_recoleccion" => $options["total_weight"]
-                    )
+                "origin" => array(
+                    "name"          => $origin["name"],
+                    "company"       => $origin["company"],
+                    "email"         => $origin["email"],
+                    "phone"         => $origin["phone"],
+                    "street"        => $origin["street"],
+                    "number"        => $origin["number"],
+                    "district"      => $origin["district"],
+                    "city"          => $origin["city"],
+                    "state"         => $origin["state"],
+                    "country"       => $origin["country"],
+                    "postalCode"    => $origin["zip"]
+                ),
+                "destination" => array(
+                    "name"          => $destination["name"],
+                    "company"       => $destination["company"],
+                    "email"         => $destination["email"],
+                    "phone"         => $destination["phone"],
+                    "street"        => $destination["street"],
+                    "number"        => $destination["number"],
+                    "district"      => $destination["district"],
+                    "city"          => $destination["city"],
+                    "state"         => $destination["state"],
+                    "country"       => $destination["country"],
+                    "postalCode"    => $destination["postalCode"]
+                ),
+                "package" => array(
+                    "content"   => $package["content"],
+                    "amount"    => $package["amount"],
+                    "type"      => $package["type"],
+                    "dimensions" => array(
+                        "length" => $package["length"],
+                        "width"  => $package["width"],
+                        "height" => $package["height"]
+                    ),
+                    "weight"        => $package["weight"],
+                    "insurance"     => $package["insurance"],
+                    "declaredValue" => $package["declaredValue"]
+                ),
+                "shipment" => array(
+                    "carrier"   => $shipment["carrier"],
+                    "service"   => $shipment["service"]
+                ),
+                "settings"=> array(
+                    "currency"=> "MXN",
+                    "labelFormat"=> "PDF",
+                    "labelSize"=> "PAPER_7X4.75"
+                )
             ];
 
             $options = array(
                 'http' => array(
-                    'header' => ["Content-Type: application/json", "Authorization: Basic " . base64_encode("$this->user:$this->password")],
+                    'header' => [
+                        "Content-Type: application/json",
+                        "Authorization: Basic ".base64_encode("$username:$password")
+                    ],
                     'method' => "POST",
                     'content' => json_encode($data)
                 ),
@@ -180,21 +212,109 @@ class EnviapaqueteriaClient
                     "verify_peer_name" => false,
                 )
             );
+            $context  = stream_context_create($options);
+            $json = file_get_contents($url, false, $context);
+            $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            $context = stream_context_create($options);
-            $response = file_get_contents($this->url.self::CREATE_PATH, false, $context);
-            $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            // Error response
+            if ($response["meta"] != "generate") {
+                return false;
+            }
 
-            return $response;
-            // if ($response[0]["status"] != "success") {
-            //     return $response;
-            // }
+            return $response["data"];
 
-            // $data = $response[0]["data"];
-            // return $data;
-
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
+
+    /**
+     * https://api.envia.com/doc.php#pickup
+     * @param $origin
+     * @param $package
+     * @param $shipment
+     * @return bool|string
+     */
+    public function pickUp($origin, $package, $shipment)
+    {
+        $url = $this->url.self::PICK_UP_PATH;
+        $username = $this->user;
+        $password = $this->password;
+
+        try {
+            $data = [
+                "origin" => array(
+                    "name"          => $origin["name"],
+                    "company"       => $origin["company"],
+                    "email"         => $origin["email"],
+                    "phone"         => $origin["phone"],
+                    "street"        => $origin["street"],
+                    "number"        => $origin["number"],
+                    "district"      => $origin["district"],
+                    "city"          => $origin["city"],
+                    "state"         => $origin["state"],
+                    "country"       => $origin["country"],
+                    "postalCode"    => $origin["zip"]
+                ),
+                "package" => array(
+                    "content"   => $package["content"],
+                    "amount"    => 1,
+                    "type"      => "box",
+                    "dimensions" => array(
+                        "length" => $package["dimensions_length"],
+                        "width"  => $package["dimensions_width"],
+                        "height" => $package["dimensions_height"]
+                    ),
+                    "weight" => $package["weight"],
+                    "insurance" => $package["insurance"],
+                    "declaredValue" => $package["declaredValue"]
+                ),
+                "shipment" => [
+                    "carrier" => $shipment["carrier"],
+                    "service" => $shipment["service"],
+                    "pickup" => [
+                        "timeFrom"  => $shipment["timeFrom"],
+                        "timeTo"    => $shipment["timeTo"],
+                        "date"      => $shipment["date"],
+                        "instructions"  => "N/A",
+                        "totalPackages" => 1,
+                        "totalWeight"   => $package["weight"]
+                    ],
+                    "settings" =>[
+                            "currency"    => "MXN",
+                            "labelFormat" => "pdf"
+                    ]
+                ]
+            ];
+
+            $options = array(
+                'http' => array(
+                    'header' => [
+                        "Content-Type: application/json",
+                        "Authorization: Basic ".base64_encode("$username:$password")
+                    ],
+                    'method' => "POST",
+                    'content' => json_encode($data)
+                ),
+                "ssl" => array(
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                )
+            );
+            $context  = stream_context_create($options);
+            $json = file_get_contents($url, false, $context);
+            $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            // Error response
+            if ($response["meta"] != "pickup") {
+                return false;
+            }
+
+            return $response["data"];
+
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
 }
