@@ -45,13 +45,17 @@ class EnviapaqueteriaClient
      * @param $options
      * @return mixed|string
      */
-    public function quote($origin, $destination, $options)
+    public function quote($provider, $origin, $destination, $options)
     {
 
         try {
             $data = [
-                "data" => array(
+                "data" => 
                     array(
+                        "info_paqueteria" => array(
+                            "paqueteria" => $provider["name"],
+                            "tipo_servicio" => $provider["service"]
+                        ),
                         "origen_representante" => $origin["representative"],
                         "origen_empresa" => $origin["company"],
                         "origen_email" => $origin["email"],
@@ -78,12 +82,11 @@ class EnviapaqueteriaClient
                         "largo" => $options["length"],
                         "peso" => $options["weight"],
                         "num_guias" => $options["amount"],
-                        "agendar_recoleccion" => $options["weight"],
+                        "agendar_recoleccion" => $options["collection"],
                         "hora_recoleccion" => $options["collection_time"],
                         "hora_limite" => $options["collection_time_limit"],
                         "fecha_recoleccion" => $options["collection_date"]
                     )
-                )
             ];
 
             $options = array(
@@ -99,7 +102,11 @@ class EnviapaqueteriaClient
             );
 
             $context = stream_context_create($options);
-            $response = json_decode(file_get_contents($this->url.self::QUOTE_PATH, false, $context));
+            $response = file_get_contents($this->url.self::QUOTE_PATH, false, $context);
+            $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            //return file_get_contents($this->url.self::QUOTE_PATH, false, $context);
+            //return $response;
 
             if ($response[0]["status"] != "success") {
                 return false;
@@ -119,7 +126,7 @@ class EnviapaqueteriaClient
 
         try {
             $data = [
-                "data" => array(
+                "data" =>
                     array(
                         "info_paqueteria" => array(
                             "paqueteria" => $provider["name"],
@@ -156,9 +163,10 @@ class EnviapaqueteriaClient
                         "hora_limite" => $options["collection_time_limit"],
                         "fecha_recoleccion" => $options["collection_date"],
                         "tipo_impresion" => $options["file"],
-                        "tipo_papel" => $options["paper"]
+                        "tipo_papel" => $options["paper"],
+                        "num_paq_recoleccion" => $options["number_of_packages"],
+						"peso_total_paq_recoleccion" => $options["total_weight"]
                     )
-                )
             ];
 
             $options = array(
@@ -174,14 +182,16 @@ class EnviapaqueteriaClient
             );
 
             $context = stream_context_create($options);
-            $response = json_decode(file_get_contents($this->url.self::CREATE_PATH, false, $context));
+            $response = file_get_contents($this->url.self::CREATE_PATH, false, $context);
+            $response = json_decode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            if ($response[0]["status"] != "success") {
-                return false;
-            }
+            return $response;
+            // if ($response[0]["status"] != "success") {
+            //     return $response;
+            // }
 
-            $data = $response[0]["data"];
-            return $data;
+            // $data = $response[0]["data"];
+            // return $data;
 
         } catch(\Exception $e) {
             return $e->getMessage();

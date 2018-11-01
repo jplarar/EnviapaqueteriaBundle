@@ -1,7 +1,8 @@
 <?php
 namespace Jplarar\EnviapaqueteriaBundle;
 
-use Jplarar\SESBundle\DependencyInjection\JplararEnviapaqueteriaExtension;
+use Jplarar\EnviapaqueteriaBundle\DependencyInjection;
+use Jplarar\EnviapaqueteriaBundle\DependencyInjection\JplararEnviapaqueteriaExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class EnviapaqueteriaBundle extends Bundle
