@@ -179,9 +179,9 @@ class EnviapaqueteriaClient
                     "amount"    => $package["amount"],
                     "type"      => $package["type"],
                     "dimensions" => array(
-                        "length" => $package["length"],
-                        "width"  => $package["width"],
-                        "height" => $package["height"]
+                        "length" => $package["dimensions_length"],
+                        "width"  => $package["dimensions_width"],
+                        "height" => $package["dimensions_height"]
                     ),
                     "weight"        => $package["weight"],
                     "insurance"     => $package["insurance"],
