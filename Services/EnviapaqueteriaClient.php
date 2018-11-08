@@ -254,7 +254,7 @@ class EnviapaqueteriaClient
                     "city"          => $origin["city"],
                     "state"         => $origin["state"],
                     "country"       => $origin["country"],
-                    "postalCode"    => $origin["zip"]
+                    "postalCode"    => $origin["postalCode"]
                 ),
                 "package" => array(
                     "content"   => $package["content"],
