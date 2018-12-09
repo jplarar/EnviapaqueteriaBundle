@@ -120,12 +120,7 @@ class EnviapaqueteriaClient
             $json = file_get_contents($url, false, $context);
             $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            // Error response
-            if ($response["meta"] != "rate") {
-                return false;
-            }
-
-            return $response["data"];
+            return $response;
 
         } catch (\Exception $e) {
             return $e->getMessage();
