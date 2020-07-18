@@ -69,7 +69,7 @@ class EnviapaqueteriaClient
                     "city"          => $origin["city"],
                     "state"         => $origin["state"],
                     "country"       => $origin["country"],
-                    "postalCode"    => $origin["zip"]
+                    "postalCode"    => $origin["postalCode"]
                 ),
                 "destination" => array(
                     "name"          => $destination["name"],
@@ -120,12 +120,7 @@ class EnviapaqueteriaClient
             $json = file_get_contents($url, false, $context);
             $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            // Error response
-            if ($response["meta"] != "rate") {
-                return false;
-            }
-
-            return $response["data"];
+            return $response;
 
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -159,7 +154,7 @@ class EnviapaqueteriaClient
                     "city"          => $origin["city"],
                     "state"         => $origin["state"],
                     "country"       => $origin["country"],
-                    "postalCode"    => $origin["zip"]
+                    "postalCode"    => $origin["postalCode"]
                 ),
                 "destination" => array(
                     "name"          => $destination["name"],
@@ -179,9 +174,9 @@ class EnviapaqueteriaClient
                     "amount"    => $package["amount"],
                     "type"      => $package["type"],
                     "dimensions" => array(
-                        "length" => $package["length"],
-                        "width"  => $package["width"],
-                        "height" => $package["height"]
+                        "length" => $package["dimensions_length"],
+                        "width"  => $package["dimensions_width"],
+                        "height" => $package["dimensions_height"]
                     ),
                     "weight"        => $package["weight"],
                     "insurance"     => $package["insurance"],
@@ -216,12 +211,7 @@ class EnviapaqueteriaClient
             $json = file_get_contents($url, false, $context);
             $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            // Error response
-            if ($response["meta"] != "generate") {
-                return false;
-            }
-
-            return $response["data"];
+            return $response;
 
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -254,7 +244,7 @@ class EnviapaqueteriaClient
                     "city"          => $origin["city"],
                     "state"         => $origin["state"],
                     "country"       => $origin["country"],
-                    "postalCode"    => $origin["zip"]
+                    "postalCode"    => $origin["postalCode"]
                 ),
                 "package" => array(
                     "content"   => $package["content"],
@@ -305,12 +295,7 @@ class EnviapaqueteriaClient
             $json = file_get_contents($url, false, $context);
             $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            // Error response
-            if ($response["meta"] != "pickup") {
-                return false;
-            }
-
-            return $response["data"];
+            return $response;
 
         } catch (\Exception $e) {
             return $e->getMessage();
