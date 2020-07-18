@@ -1,6 +1,6 @@
 <?php
 
-namespace Jplarar\EnviapaqueteriaBundle\DependencyInjection;
+namespace Jplarar\EnviaBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -18,22 +18,15 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('jplarar_enviapaqueteria');
+        $rootNode = $treeBuilder->root('jplarar_envia');
 
         $rootNode
             ->children()
-                ->arrayNode('enviapaqueteria_keys')
-                    ->children()
-                        ->scalarNode('enviapaqueteria_user')
-                            ->defaultValue(null)
-                        ->end()
-                        ->scalarNode('enviapaqueteria_password')
-                            ->defaultValue(null)
-                        ->end()
-                        ->scalarNode('enviapaqueteria_environment')
-                            ->defaultValue(null)
-                        ->end()
-                    ->end()
+                ->scalarNode('envia_token')
+                    ->defaultValue(null)
+                ->end()
+                ->scalarNode('envia_environment')
+                    ->defaultValue(null)
                 ->end()
             ->end();
 

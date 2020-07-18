@@ -1,11 +1,11 @@
 <?php
-namespace Jplarar\EnviapaqueteriaBundle;
+namespace Jplarar\EnviaBundle;
 
-use Jplarar\EnviapaqueteriaBundle\DependencyInjection;
-use Jplarar\EnviapaqueteriaBundle\DependencyInjection\JplararEnviapaqueteriaExtension;
+use Jplarar\EnviaBundle\DependencyInjection;
+use Jplarar\EnviaBundle\DependencyInjection\JplararEnviaExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class EnviapaqueteriaBundle extends Bundle
+class EnviaBundle extends Bundle
 {
     /**
      * {@inheritDoc}
@@ -17,7 +17,7 @@ class EnviapaqueteriaBundle extends Bundle
         // this allows us to have custom extension alias
         // default convention would put a lot of underscores
         if (null === $this->extension) {
-            $this->extension = new JplararEnviapaqueteriaExtension();
+            $this->extension = new JplararEnviaExtension();
         }
 
         return $this->extension;
