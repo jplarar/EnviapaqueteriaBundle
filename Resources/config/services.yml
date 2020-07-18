@@ -1,4 +1,10 @@
+parameters:
+  envia_client.class: Jplarar\EnviaBundle\Services\EnviaClient
+
 services:
-     enviapaqueteria_client:
-         class:     Jplarar\EnviapaqueteriaBundle\Services\EnviapaqueteriaClient
-         arguments: [%enviapaqueteria_user%, %enviapaqueteria_password%, %enviapaqueteria_environment%]
+    Jplarar\EnviaBundle\Services\EnviaClient: "@envia_client"
+    envia_client:
+        class:     "%envia_client.class%"
+        arguments: ["%envia_token%", "%envia_environment%"]
+        autowire: true
+        public: true

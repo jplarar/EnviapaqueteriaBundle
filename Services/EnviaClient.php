@@ -1,13 +1,13 @@
 <?php
 
-namespace Jplarar\EnviapaqueteriaBundle\Services;
-
+namespace Jplarar\EnviaBundle\Services;
+use Exception;
 /**
  * Reference: https://api.envia.com/doc.php#reference
- * Class EnviapaqueteriaClient
+ * Class EnviaClient
  * @package Jplarar\EnviapaqueteriaBundle\Services
  */
-class EnviapaqueteriaClient
+class EnviaClient
 {
 
     const ENDPOINT = "https://api.envia.com";
@@ -17,24 +17,17 @@ class EnviapaqueteriaClient
     const GENERATE_PATH = "/ship/generate/";
     const PICK_UP_PATH = "/ship/pickup/";
 
-    // NOT ON USER
-    const CANCEL_PATH = "/ship/cancel/";
-    const TRACK_PATH = "/ship/generaltrack/";
-
-    protected $user;
-    protected $password;
+    protected $token;
     protected $url;
 
     /**
-     * AmazonSESClient constructor.
-     * @param $enviapaqueteria_user
-     * @param $enviapaqueteria_password
-     * @param $environment
+     * EnviaClient constructor.
+     * @param $envia_token
+     * @param string $environment
      */
-    public function __construct($enviapaqueteria_user, $enviapaqueteria_password, $environment = "prod")
+    public function __construct($envia_token, $environment = "prod")
     {
-        $this->user = $enviapaqueteria_user;
-        $this->password = $enviapaqueteria_password;
+        $this->token = $envia_token;
         if ($environment == "prod") {
             $this->url = self::ENDPOINT;
         } else {
@@ -53,8 +46,6 @@ class EnviapaqueteriaClient
     public function quote($origin, $destination, $package, $shipment)
     {
         $url = $this->url.self::RATE_PATH;
-        $username = $this->user;
-        $password = $this->password;
 
         try {
             $data = [
@@ -69,7 +60,8 @@ class EnviapaqueteriaClient
                     "city"          => $origin["city"],
                     "state"         => $origin["state"],
                     "country"       => $origin["country"],
-                    "postalCode"    => $origin["postalCode"]
+                    "postalCode"    => $origin["postalCode"],
+                    "reference"     => ""
                 ),
                 "destination" => array(
                     "name"          => $destination["name"],
@@ -82,23 +74,29 @@ class EnviapaqueteriaClient
                     "city"          => $destination["city"],
                     "state"         => $destination["state"],
                     "country"       => $destination["country"],
-                    "postalCode"    => $destination["postalCode"]
+                    "postalCode"    => $destination["postalCode"],
+                    "reference"     => ""
                 ),
-                "package" => array(
+                "packages" => [
+                    [
                     "content"   => $package["content"],
                     "amount"    => $package["amount"],
                     "type"      => $package["type"],
-                    "dimensions" => array(
+                    "dimensions" => [
                         "length" => $package["dimensions_length"],
                         "width"  => $package["dimensions_width"],
                         "height" => $package["dimensions_height"]
-                    ),
+                    ],
                     "weight" => $package["weight"],
                     "insurance" => $package["insurance"],
-                    "declaredValue" => $package["declaredValue"]
-                ),
+                    "declaredValue" => $package["declaredValue"],
+                    "weightUnit" => "KG",
+                    "lengthUnit"=> "CM"
+                    ]
+                ],
                 "shipment" => array(
-                    "carrier" => $shipment["carrier"]
+                    "carrier" => $shipment["carrier"],
+                    "type" => 1
                 )
             ];
 
@@ -106,7 +104,7 @@ class EnviapaqueteriaClient
                 'http' => array(
                     'header' => [
                         "Content-Type: application/json",
-                        "Authorization: Basic ".base64_encode("$username:$password")
+                        "Authorization: Bearer ".$this->token
                     ],
                     'method' => "POST",
                     'content' => json_encode($data)
@@ -118,11 +116,9 @@ class EnviapaqueteriaClient
             );
             $context  = stream_context_create($options);
             $json = file_get_contents($url, false, $context);
-            $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            return json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            return $response;
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $e->getMessage();
         }
     }
@@ -138,8 +134,6 @@ class EnviapaqueteriaClient
     public function create($origin, $destination, $package, $shipment)
     {
         $url = $this->url.self::GENERATE_PATH;
-        $username = $this->user;
-        $password = $this->password;
 
         try {
             $data = [
@@ -154,7 +148,8 @@ class EnviapaqueteriaClient
                     "city"          => $origin["city"],
                     "state"         => $origin["state"],
                     "country"       => $origin["country"],
-                    "postalCode"    => $origin["postalCode"]
+                    "postalCode"    => $origin["postalCode"],
+                    "reference"     => ""
                 ),
                 "destination" => array(
                     "name"          => $destination["name"],
@@ -167,29 +162,35 @@ class EnviapaqueteriaClient
                     "city"          => $destination["city"],
                     "state"         => $destination["state"],
                     "country"       => $destination["country"],
-                    "postalCode"    => $destination["postalCode"]
+                    "postalCode"    => $destination["postalCode"],
+                    "reference"     => ""
                 ),
-                "package" => array(
-                    "content"   => $package["content"],
-                    "amount"    => $package["amount"],
-                    "type"      => $package["type"],
-                    "dimensions" => array(
-                        "length" => $package["dimensions_length"],
-                        "width"  => $package["dimensions_width"],
-                        "height" => $package["dimensions_height"]
-                    ),
-                    "weight"        => $package["weight"],
-                    "insurance"     => $package["insurance"],
-                    "declaredValue" => $package["declaredValue"]
-                ),
+                "packages" => [
+                    [
+                        "content"   => $package["content"],
+                        "amount"    => $package["amount"],
+                        "type"      => $package["type"],
+                        "dimensions" => [
+                            "length" => $package["dimensions_length"],
+                            "width"  => $package["dimensions_width"],
+                            "height" => $package["dimensions_height"]
+                        ],
+                        "weight" => $package["weight"],
+                        "insurance" => $package["insurance"],
+                        "declaredValue" => $package["declaredValue"],
+                        "weightUnit" => "KG",
+                        "lengthUnit"=> "CM"
+                    ]
+                ],
                 "shipment" => array(
                     "carrier"   => $shipment["carrier"],
-                    "service"   => $shipment["service"]
+                    "service"   => $shipment["service"],
+                    "type"      => 1
                 ),
                 "settings"=> array(
-                    "currency"=> "MXN",
-                    "labelFormat"=> "PDF",
-                    "labelSize"=> "PAPER_7X4.75"
+                    "printFormat"=> "PDF",
+                    "printSize"=> "STOCK_4X6",
+                    "comments" => ""
                 )
             ];
 
@@ -197,7 +198,7 @@ class EnviapaqueteriaClient
                 'http' => array(
                     'header' => [
                         "Content-Type: application/json",
-                        "Authorization: Basic ".base64_encode("$username:$password")
+                        "Authorization: Basic ".$this->token
                     ],
                     'method' => "POST",
                     'content' => json_encode($data)
@@ -209,11 +210,8 @@ class EnviapaqueteriaClient
             );
             $context  = stream_context_create($options);
             $json = file_get_contents($url, false, $context);
-            $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-            return $response;
-
-        } catch (\Exception $e) {
+            return json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        } catch (Exception $e) {
             return $e->getMessage();
         }
     }
@@ -228,8 +226,6 @@ class EnviapaqueteriaClient
     public function pickUp($origin, $package, $shipment)
     {
         $url = $this->url.self::PICK_UP_PATH;
-        $username = $this->user;
-        $password = $this->password;
 
         try {
             $data = [
@@ -246,22 +242,9 @@ class EnviapaqueteriaClient
                     "country"       => $origin["country"],
                     "postalCode"    => $origin["postalCode"]
                 ),
-                "package" => array(
-                    "content"   => $package["content"],
-                    "amount"    => 1,
-                    "type"      => "box",
-                    "dimensions" => array(
-                        "length" => $package["dimensions_length"],
-                        "width"  => $package["dimensions_width"],
-                        "height" => $package["dimensions_height"]
-                    ),
-                    "weight" => $package["weight"],
-                    "insurance" => $package["insurance"],
-                    "declaredValue" => $package["declaredValue"]
-                ),
                 "shipment" => [
                     "carrier" => $shipment["carrier"],
-                    "service" => $shipment["service"],
+                    "type"    => 1,
                     "pickup" => [
                         "timeFrom"  => $shipment["timeFrom"],
                         "timeTo"    => $shipment["timeTo"],
@@ -281,7 +264,7 @@ class EnviapaqueteriaClient
                 'http' => array(
                     'header' => [
                         "Content-Type: application/json",
-                        "Authorization: Basic ".base64_encode("$username:$password")
+                        "Authorization: Basic ".$this->token
                     ],
                     'method' => "POST",
                     'content' => json_encode($data)
@@ -293,11 +276,9 @@ class EnviapaqueteriaClient
             );
             $context  = stream_context_create($options);
             $json = file_get_contents($url, false, $context);
-            $response = json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            return json_decode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            return $response;
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $e->getMessage();
         }
     }
