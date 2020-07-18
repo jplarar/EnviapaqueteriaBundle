@@ -1,10 +1,11 @@
 {
     "name": "jplarar/enviapaqueteria-bundle",
-    "description": "A simple Symfony2 bundle for Enviapaqueteria API.",
+    "description": "A simple Symfony2 bundle for Envia API.",
     "type": "symfony-bundle",
     "keywords": [
         "jplarar",
-        "enviapaqueteria"
+        "enviapaqueteria",
+        "envia"
     ],
     "homepage": "https://github.com/jplarar/EnviapaqueteriaBundle",
     "license": "MIT",
@@ -31,7 +32,7 @@
     "require-dev": {
     },
     "autoload": {
-      "psr-0": { "Jplarar\\EnviapaqueteriaBundle": "" }
+      "psr-0": { "Jplarar\\EnviaBundle": "" }
     },
-    "target-dir": "Jplarar/EnviapaqueteriaBundle"
+    "target-dir": "Jplarar/EnviaBundle"
 }
