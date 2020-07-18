@@ -1,7 +1,6 @@
 <?php
 namespace Jplarar\EnviaBundle;
 
-use Jplarar\EnviaBundle\DependencyInjection;
 use Jplarar\EnviaBundle\DependencyInjection\JplararEnviaExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
