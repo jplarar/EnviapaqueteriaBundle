@@ -264,7 +264,7 @@ class EnviaClient
                 'http' => array(
                     'header' => [
                         "Content-Type: application/json",
-                        "Authorization: Basic ".$this->token
+                        "Authorization: Bearer ".$this->token
                     ],
                     'method' => "POST",
                     'content' => json_encode($data)
